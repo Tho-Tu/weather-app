@@ -12,7 +12,9 @@ async function getWeather(location, apiKey) {
     );
     const responseData = await response.json();
     console.log(responseData);
+    return responseData;
   } catch (err) {
+    alert(err);
     console.log(err);
   }
 }
@@ -26,7 +28,20 @@ async function getForecast(location, apiKey) {
     );
     const responseData = await response.json();
     console.log(responseData);
+    return responseData;
   } catch (err) {
     console.log(err);
   }
 }
+
+// function getUserLocation() {
+//   const successCallback = (position) => {
+//     return `${position.coords.latitude},${position.coords.longitude}`;
+//   };
+
+//   const errorCallback = (error) => {
+//     console.log(error);
+//   };
+
+//   navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+// }
