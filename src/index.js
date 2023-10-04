@@ -18,7 +18,7 @@ async function getWeather(location, apiKey) {
 }
 
 async function getForecast(location, apiKey) {
-  // current forecast
+  // 3 day forecast
   try {
     const response = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=3`,
