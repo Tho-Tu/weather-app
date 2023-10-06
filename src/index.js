@@ -1,7 +1,7 @@
 const weatherAPIKey = "07e4e2a749f046b5afc04637230210";
 
-// getWeather("new york", weatherAPIKey);
-// getForecast("new york", weatherAPIKey);
+getWeather("new york", weatherAPIKey);
+getForecast("new york", weatherAPIKey);
 
 searchCity();
 
@@ -42,7 +42,14 @@ function searchCity() {
   searchWeather.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    getWeather(`${weatherLocation.value}`, weatherAPIKey);
+    getWeather(`${weatherLocation.value}`, weatherAPIKey)
+      .then((weatherObject) => {
+        weatherLocation.setCustomValidity("");
+        displayDOM(weatherObject);
+      })
+      .catch((error) => {
+        weatherLocation.setCustomValidity("Please enter valid city");
+      });
   });
 
   // HANDLE ERROR
@@ -52,15 +59,28 @@ function toggleTemperature() {
   const toggleTemp = document.getElementById("toggle-temp");
 }
 
-function displayDOM() {
+function displayDOM(weatherObject) {
   // today's weather
   const locationName = document.querySelector(".location-name");
+  locationName.textContent = weatherObject.location.name;
+
   const locationTime = document.querySelector(".location-time");
-  const locationWeather = document.querySelector("location-weather");
+  locationTime.textContent = weatherObject.location.localtime;
+
+  const locationWeather = document.querySelector(".location-weather");
+  locationWeather.textContent = weatherObject.current.condition.text;
+
   const locationTemperature = document.querySelector(".location-temperature");
+  locationTemperature.textContent = `${weatherObject.current.temp_c}°C`;
+
   const locationFeel = document.querySelector(".location-feel");
+  locationFeel.textContent = `Feels like: ${weatherObject.current.feelslike_c}°C`;
+
   const locationWind = document.querySelector(".location-wind");
+  locationWind.textContent = `Wind Speed: ${weatherObject.current.wind_kph}km/h`;
+
   const locationHumidity = document.querySelector(".location-humidity");
+  locationHumidity.textContent = `Humidity: ${weatherObject.current.humidity}%`;
 
   // weather forecast for next 3 days
   for (let i = 1; i < 4; i++) {
