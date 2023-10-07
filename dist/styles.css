@@ -90,6 +90,11 @@ button:active {
   margin: 2rem 0;
 }
 
+#error-msg {
+  font-size: 1.5rem;
+  margin: 8px;
+}
+
 .location-name {
   font-size: 4rem;
   margin: 8px 0;

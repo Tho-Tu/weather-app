@@ -1,64 +1,73 @@
 // free key
 const weatherAPIKey = "07e4e2a749f046b5afc04637230210";
 
+let globalForecastObject;
 searchCity();
-
-async function getForecast(location, apiKey) {
-  try {
-    const response = await fetch(
-      `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=3`,
-      { mode: "cors" }
-    );
-    const responseData = await response.json();
-    console.log(responseData);
-
-    if (response.ok) {
-      return responseData;
-    } else {
-      throw new Error(responseData.error.message);
-    }
-  } catch (error) {
-    throw new Error("Unable to fetch weather data");
-  }
-}
 
 function searchCity() {
   const weatherLocation = document.getElementById("weather-location");
   const searchWeather = document.getElementById("search-weather");
+
   searchWeather.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    weatherLocation.setCustomValidity("");
     loadCity(`${weatherLocation.value}`, weatherAPIKey);
     searchWeather.reset();
   });
 
   loadCity("new york", weatherAPIKey);
+}
 
-  function loadCity(location, apiKey) {
-    getForecast(location, apiKey)
-      .then((forecastObject) => {
-        if (forecastObject.error) {
-          weatherLocation.setCustomValidity(forecastObject.error.message);
-        } else {
-          // Clear the custom validity when a valid city is loaded
-          weatherLocation.setCustomValidity("");
-          displayDOM(forecastObject);
-        }
-      })
-      .catch((error) => {
-        // Handle network errors here
-        console.error(error);
-        weatherLocation.setCustomValidity("Failed to fetch weather data");
-      });
-  }
+function loadCity(location, apiKey) {
+  const errorMessage = document.getElementById("error-msg");
+  getForecast(location, apiKey)
+    .then((forecastObject) => {
+      if (forecastObject.error) {
+        errorMessage.textContent = `${forecastObject.error.message}`;
+      } else {
+        // Clear the custom validity when a valid city is loaded
+        displayDOM(forecastObject, "°C");
+        errorMessage.textContent = "";
+        globalForecastObject = forecastObject;
+      }
+    })
+    .catch((error) => {
+      console.error("getForecast error: " + error);
+    });
+}
+
+async function getForecast(location, apiKey) {
+  const response = await fetch(
+    `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=3`,
+    { mode: "cors" }
+  );
+  const responseData = await response.json();
+  console.log(responseData);
+  console.log("response.ok: " + response.ok);
+
+  return responseData;
 }
 
 function toggleTemperature() {
+  let isCelsius = true;
+
   const toggleTemp = document.getElementById("toggle-temp");
+  toggleTemp.addEventListener("click", () => {
+    let tempCelOrFah = isCelsius ? "°C" : "°F";
+
+    console.log(globalForecastObject);
+
+    if (!isCelsius) {
+      displayDOM(globalForecastObject, tempCelOrFah);
+      isCelsius = false;
+    } else {
+      displayDOM(globalForecastObject, tempCelOrFah);
+      isCelsius = true;
+    }
+  });
 }
 
-function displayDOM(forecastObject) {
+function displayDOM(forecastObject, tempCelOrFah) {
   // define days
   const days = [
     "Sunday",
