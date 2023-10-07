@@ -1,25 +1,9 @@
+// free key
 const weatherAPIKey = "07e4e2a749f046b5afc04637230210";
 
-getWeather("new york", weatherAPIKey);
 getForecast("new york", weatherAPIKey);
 
 searchCity();
-
-async function getWeather(location, apiKey) {
-  // current weather
-  try {
-    const response = await fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}`,
-      { mode: "cors" }
-    );
-    const responseData = await response.json();
-    console.log(responseData);
-    return responseData;
-  } catch (err) {
-    alert(err);
-    console.log(err);
-  }
-}
 
 async function getForecast(location, apiKey) {
   // 3 day forecast
@@ -42,14 +26,16 @@ function searchCity() {
   searchWeather.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    getWeather(`${weatherLocation.value}`, weatherAPIKey)
-      .then((weatherObject) => {
+    getForecast(`${weatherLocation.value}`, weatherAPIKey)
+      .then((forecastObject) => {
         weatherLocation.setCustomValidity("");
-        displayDOM(weatherObject);
+        displayDOM(forecastObject);
       })
       .catch((error) => {
         weatherLocation.setCustomValidity("Please enter valid city");
       });
+
+    searchWeather.reset();
   });
 
   // HANDLE ERROR
@@ -59,45 +45,46 @@ function toggleTemperature() {
   const toggleTemp = document.getElementById("toggle-temp");
 }
 
-function displayDOM(weatherObject) {
+function displayDOM(forecastObject) {
+  // define days
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
   // today's weather
   const locationName = document.querySelector(".location-name");
-  locationName.textContent = weatherObject.location.name;
-
   const locationTime = document.querySelector(".location-time");
-  locationTime.textContent = weatherObject.location.localtime;
-
   const locationWeather = document.querySelector(".location-weather");
-  locationWeather.textContent = weatherObject.current.condition.text;
-
   const locationTemperature = document.querySelector(".location-temperature");
-  locationTemperature.textContent = `${weatherObject.current.temp_c}°C`;
-
   const locationFeel = document.querySelector(".location-feel");
-  locationFeel.textContent = `Feels like: ${weatherObject.current.feelslike_c}°C`;
-
   const locationWind = document.querySelector(".location-wind");
-  locationWind.textContent = `Wind Speed: ${weatherObject.current.wind_kph}km/h`;
-
   const locationHumidity = document.querySelector(".location-humidity");
-  locationHumidity.textContent = `Humidity: ${weatherObject.current.humidity}%`;
 
-  // weather forecast for next 3 days
-  for (let i = 1; i < 4; i++) {
-    const dayName = document.querySelector(`[data-name="${i}"]`);
-    const dayWeather = document.querySelector(`[data-name="${i}"]`);
-    const dayTemp = document.querySelector(`[data-name="${i}"]`);
-  }
+  locationName.textContent = forecastObject.location.name;
+  locationTime.textContent = forecastObject.location.localtime;
+  locationTemperature.textContent = `${forecastObject.current.temp_c}°C`;
+  locationFeel.textContent = `Feels like: ${forecastObject.current.feelslike_c}°C`;
+  locationWind.textContent = `Wind Speed: ${forecastObject.current.wind_kph}km/h`;
+  locationHumidity.textContent = `Humidity: ${forecastObject.current.humidity}%`;
+
+  // weather forecast for 3 days
+  forecastObject.forecast.forecastday.forEach((forecastDayElement, index) => {
+    const dayName = document.querySelector(`[data-name="${index}"]`);
+    const dayWeather = document.querySelector(`[data-weather="${index}"]`);
+    const dayTemp = document.querySelector(`[data-temp="${index}"]`);
+
+    let d = new Date(forecastDayElement.date);
+    let calcDayName = days[d.getDay()];
+    dayName.textContent = calcDayName;
+
+    dayWeather.textContent = forecastDayElement.day.condition.text;
+
+    dayTemp.textContent = forecastDayElement.day.avgtemp_c;
+  });
 }
-
-// function getUserLocation() {
-//   const successCallback = (position) => {
-//     return `${position.coords.latitude},${position.coords.longitude}`;
-//   };
-
-//   const errorCallback = (error) => {
-//     console.log(error);
-//   };
-
-//   navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-// }
