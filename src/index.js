@@ -1,7 +1,7 @@
 // free key
 const weatherAPIKey = "07e4e2a749f046b5afc04637230210";
 
-let globalForecastObject;
+let globalLocation = "new york";
 searchCity();
 
 function searchCity() {
@@ -10,8 +10,8 @@ function searchCity() {
 
   searchWeather.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    loadCity(`${weatherLocation.value}`, weatherAPIKey);
+    globalLocation = weatherLocation.value;
+    loadCity(`${globalLocation}`, weatherAPIKey);
     searchWeather.reset();
   });
 
@@ -26,9 +26,8 @@ function loadCity(location, apiKey) {
         errorMessage.textContent = `${forecastObject.error.message}`;
       } else {
         // Clear the custom validity when a valid city is loaded
-        displayDOM(forecastObject, "°C");
+        displayDOM(forecastObject, isCelsius);
         errorMessage.textContent = "";
-        globalForecastObject = forecastObject;
       }
     })
     .catch((error) => {
@@ -48,26 +47,21 @@ async function getForecast(location, apiKey) {
   return responseData;
 }
 
+let isCelsius = true;
+toggleTemperature();
 function toggleTemperature() {
-  let isCelsius = true;
-
   const toggleTemp = document.getElementById("toggle-temp");
   toggleTemp.addEventListener("click", () => {
-    let tempCelOrFah = isCelsius ? "°C" : "°F";
-
-    console.log(globalForecastObject);
-
-    if (!isCelsius) {
-      displayDOM(globalForecastObject, tempCelOrFah);
+    if (isCelsius) {
       isCelsius = false;
     } else {
-      displayDOM(globalForecastObject, tempCelOrFah);
       isCelsius = true;
     }
+    loadCity(globalLocation, weatherAPIKey);
   });
 }
 
-function displayDOM(forecastObject, tempCelOrFah) {
+function displayDOM(forecastObject, isCelsius) {
   // define days
   const days = [
     "Sunday",
@@ -91,10 +85,18 @@ function displayDOM(forecastObject, tempCelOrFah) {
   locationName.textContent = forecastObject.location.name;
   locationTime.textContent = forecastObject.location.localtime;
   locationWeather.textContent = forecastObject.current.condition.text;
-  locationTemperature.textContent = `${forecastObject.current.temp_c}°C`;
-  locationFeel.textContent = `Feels like: ${forecastObject.current.feelslike_c}°C`;
+
   locationWind.textContent = `Wind Speed: ${forecastObject.current.wind_kph}km/h`;
   locationHumidity.textContent = `Humidity: ${forecastObject.current.humidity}%`;
+
+  // temperature control
+  if (isCelsius) {
+    locationTemperature.textContent = `${forecastObject.current.temp_c}°C`;
+    locationFeel.textContent = `Feels like: ${forecastObject.current.feelslike_c}°C`;
+  } else {
+    locationTemperature.textContent = `${forecastObject.current.temp_f}°F`;
+    locationFeel.textContent = `Feels like: ${forecastObject.current.feelslike_f}°F`;
+  }
 
   // weather forecast for 3 days
   forecastObject.forecast.forecastday.forEach((forecastDayElement, index) => {
@@ -108,6 +110,10 @@ function displayDOM(forecastObject, tempCelOrFah) {
 
     dayWeather.textContent = forecastDayElement.day.condition.text;
 
-    dayTemp.textContent = `${forecastDayElement.day.avgtemp_c}°C`;
+    if (isCelsius) {
+      dayTemp.textContent = `${forecastDayElement.day.avgtemp_c}°C`;
+    } else {
+      dayTemp.textContent = `${forecastDayElement.day.avgtemp_f}°F`;
+    }
   });
 }
