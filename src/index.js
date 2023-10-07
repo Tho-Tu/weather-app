@@ -1,12 +1,9 @@
 // free key
 const weatherAPIKey = "07e4e2a749f046b5afc04637230210";
 
-getForecast("new york", weatherAPIKey);
-
 searchCity();
 
 async function getForecast(location, apiKey) {
-  // 3 day forecast
   try {
     const response = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=3`,
@@ -14,9 +11,14 @@ async function getForecast(location, apiKey) {
     );
     const responseData = await response.json();
     console.log(responseData);
-    return responseData;
-  } catch (err) {
-    console.log(err);
+
+    if (response.ok) {
+      return responseData;
+    } else {
+      throw new Error(responseData.error.message);
+    }
+  } catch (error) {
+    throw new Error("Unable to fetch weather data");
   }
 }
 
@@ -26,19 +28,30 @@ function searchCity() {
   searchWeather.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    getForecast(`${weatherLocation.value}`, weatherAPIKey)
-      .then((forecastObject) => {
-        weatherLocation.setCustomValidity("");
-        displayDOM(forecastObject);
-      })
-      .catch((error) => {
-        weatherLocation.setCustomValidity("Please enter valid city");
-      });
-
+    weatherLocation.setCustomValidity("");
+    loadCity(`${weatherLocation.value}`, weatherAPIKey);
     searchWeather.reset();
   });
 
-  // HANDLE ERROR
+  loadCity("new york", weatherAPIKey);
+
+  function loadCity(location, apiKey) {
+    getForecast(location, apiKey)
+      .then((forecastObject) => {
+        if (forecastObject.error) {
+          weatherLocation.setCustomValidity(forecastObject.error.message);
+        } else {
+          // Clear the custom validity when a valid city is loaded
+          weatherLocation.setCustomValidity("");
+          displayDOM(forecastObject);
+        }
+      })
+      .catch((error) => {
+        // Handle network errors here
+        console.error(error);
+        weatherLocation.setCustomValidity("Failed to fetch weather data");
+      });
+  }
 }
 
 function toggleTemperature() {
@@ -68,6 +81,7 @@ function displayDOM(forecastObject) {
 
   locationName.textContent = forecastObject.location.name;
   locationTime.textContent = forecastObject.location.localtime;
+  locationWeather.textContent = forecastObject.current.condition.text;
   locationTemperature.textContent = `${forecastObject.current.temp_c}°C`;
   locationFeel.textContent = `Feels like: ${forecastObject.current.feelslike_c}°C`;
   locationWind.textContent = `Wind Speed: ${forecastObject.current.wind_kph}km/h`;
@@ -85,6 +99,6 @@ function displayDOM(forecastObject) {
 
     dayWeather.textContent = forecastDayElement.day.condition.text;
 
-    dayTemp.textContent = forecastDayElement.day.avgtemp_c;
+    dayTemp.textContent = `${forecastDayElement.day.avgtemp_c}°C`;
   });
 }
