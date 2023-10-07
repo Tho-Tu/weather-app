@@ -95,17 +95,17 @@ button:active {
   grid-column: 1 / 2;
 }
 
-.day-one {
+.day-zero {
   grid-row: 3 / 4;
   grid-column: 1 / 2;
 }
 
-.day-two {
+.day-one {
   grid-row: 3 / 4;
   grid-column: 2 / 3;
 }
 
-.day-three {
+.day-two {
   grid-row: 3 / 4;
   grid-column: 3 / 4;
 }
