@@ -10,6 +10,9 @@
 body {
   font-family: var(--font-default);
   margin: 0;
+  background-image: url("./components/northern-lights.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 button {
@@ -65,8 +68,6 @@ button:active {
   height: 100vh;
   padding: 1rem;
   color: white;
-  background-image: url("./components/northern-lights.jpg");
-  background-size: cover;
   font-size: 2.5rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
