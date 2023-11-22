@@ -9,3 +9,5 @@ This Weather App provides real-time weather information based on user input. It 
 - Real-time Weather Data: Get up-to-date weather information for any location.
 - User-Friendly Interface: Intuitive design for easy navigation and use.
 - Asynchronous Operations: Utilizes promises to handle asynchronous tasks efficiently.
+
+Click [here](https://tho-tu.github.io/weather-app/) for the live version!
