@@ -11,3 +11,7 @@ This Weather App provides real-time weather information based on user input. It 
 - Asynchronous Operations: Utilizes promises to handle asynchronous tasks efficiently.
 
 Click [here](https://tho-tu.github.io/weather-app/) for the live version!
+
+🖼 Project Screenshot:
+
+![Alt text](./dist/assets/project-screenshot.png)
